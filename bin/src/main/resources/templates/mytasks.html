@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
+<head>
+<title>Tasks</title>
+<link rel="stylesheet" type="text/css" media="all"
+	th:href="@{/css/style.css}" href="../css/style.css" />
+</head>
+<body>
+	<div class="container">
+		<div class="newTask">
+			<h2> Add new task your todo-list </h2>
+			<form th:action="@{/todo/add}" th:object="${newTodo}" th:method="post">
+				<table>
+					<tr>
+						<td>Name:</td>
+						<td><input type="text" th:field="*{name}" required="required" /></td>
+					</tr>
+					<tr>
+						<td>Information:</td>
+						<td><input type="text" th:field="*{information}" required="required" /></td>
+					</tr>
+					<tr>
+						<td colspan="2"><button type="submit" style="margin-left: 65px;">Add new Task</button></td>
+					</tr>
+				</table>
+			</form>
+		</div>
+		<div class="listTask">
+			<h2 style="text-align:center;"> Your Task List </h2>
+			<table id="list">
+				<tr>
+					<th>Delete</th>
+					<th>Name</th>
+					<th>Info</th>
+					<th>Status</th>
+					<th>Update Status</th>
+				</tr>
+				<tr th:each="todo : ${todos}">
+					<td>
+						<form th:action="@{/todo/delete/} + ${todo.id}" th:method="delete">
+							<button type="submit">Delete</button>
+						</form>
+					</td>
+					<td th:text="${todo.name}">Item code will appear here</td>
+					<td th:text="${todo.information}">Item type will appear here</td>
+					<td th:text="${todo.status}">Item type will appear here</td>
+					<td>
+						<form th:action="@{/todo/} + ${todo.id}" th:method="put">
+							<select th:field="*{updateTodo.status}">
+								<option th:value="NOT_STARTED" th:text="NOT_STARTED">Status</option>
+								<option th:value="IN_PROGRESS" th:text="IN_PROGRESS">Status</option>
+								<option th:value="COMPLETED" th:text="COMPLETED">Status</option>
+							</select>
+							<button type="submit">Update</button>
+						</form>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</body>
+</html>
