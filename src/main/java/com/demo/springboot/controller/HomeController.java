@@ -17,6 +17,7 @@ import com.demo.springboot.domain.User;
 import com.demo.springboot.exception.TodoLoginException;
 import com.demo.springboot.service.TodoService;
 import com.demo.springboot.service.UserService;
+import com.demo.springboot.service.response.UserResponse;
 
 @Controller
 public class HomeController {
@@ -42,13 +43,14 @@ public class HomeController {
 	
 	@RequestMapping(value = {"/loginUser"} ,method=RequestMethod.POST)
 	public ModelAndView loginUser(@ModelAttribute("user") User user, HttpSession session) throws TodoLoginException{
-		User loginedUser = userService.login(user);
-		if(loginedUser!=null){
+		UserResponse response = userService.login(user);
+		if(Boolean.TRUE.equals(response.getSuccess())){
+			User loginedUser = response.getUser();
 			session.setAttribute("loginedUser", loginedUser);
 			return todoUtil.prepareModel(loginedUser);
+		}else{
+			throw new TodoLoginException(response.getErrorMessage());
 		}
-		else
-			throw new TodoLoginException(LOGIN_ERROR);
 	}
 	
 	@ExceptionHandler(TodoLoginException.class)

@@ -13,6 +13,7 @@ import com.demo.springboot.SpringDemoApplication;
 import com.demo.springboot.domain.User;
 import com.demo.springboot.repository.UserRepository;
 import com.demo.springboot.service.UserService;
+import com.demo.springboot.service.response.UserResponse;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = SpringDemoApplication.class)
@@ -36,7 +37,8 @@ public class UserServiceTest {
 		newUser.setPassword(TEST_PASSWORD);
 		newUser.setDepartment(TEST_DEPARTMENT);
 		
-		userService.registerUser(newUser);
+		UserResponse response = userService.registerUser(newUser);
+		assertTrue(response.getSuccess());
 		assertNotNull(newUser.getId());
 		
 		User userFromDB = userRepository.findOne(newUser.getId());
@@ -45,6 +47,12 @@ public class UserServiceTest {
 		assertEquals(newUser.getDepartment(), userFromDB.getDepartment());
 		
 		userRepository.delete(newUser.getId());
+		
+		User secondTestUser = new User();
+		secondTestUser.setName(TEST_NAME);
+		response = userService.registerUser(secondTestUser);
+		assertFalse(response.getSuccess());
+		
 	}
 	
 	@Test
@@ -54,14 +62,21 @@ public class UserServiceTest {
 		newUser.setPassword(TEST_PASSWORD);
 		newUser.setDepartment(TEST_DEPARTMENT);
 		
-		userService.registerUser(newUser);
+		UserResponse response = userService.registerUser(newUser);
+		assertTrue(response.getSuccess());
 		assertNotNull(newUser.getId());
 		
-		User loginedUser = userService.login(newUser);
+		response = userService.login(newUser);
+		assertTrue(response.getSuccess());
+		User loginedUser = response.getUser();
 		
 		assertEquals(newUser.getName(), loginedUser.getName());
 		assertEquals(newUser.getPassword(), loginedUser.getPassword());
 		assertEquals(newUser.getDepartment(), loginedUser.getDepartment());
+		
+		newUser.setPassword(null);
+		response = userService.login(newUser);
+		assertFalse(response.getSuccess());
 		
 		userRepository.delete(newUser.getId());
 	}

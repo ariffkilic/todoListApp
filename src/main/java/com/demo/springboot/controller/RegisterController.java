@@ -17,6 +17,7 @@ import com.demo.springboot.domain.User;
 import com.demo.springboot.exception.TodoCreationException;
 import com.demo.springboot.service.TodoService;
 import com.demo.springboot.service.UserService;
+import com.demo.springboot.service.response.UserResponse;
 
 @Controller
 public class RegisterController {
@@ -38,13 +39,14 @@ public class RegisterController {
 	}
 	
 	@RequestMapping(value="/registerUser", method=RequestMethod.POST)
-	public ModelAndView registerUser(@ModelAttribute("user") User user, HttpSession session) throws TodoCreationException{		
-		User newUser = userService.registerUser(user);
-		if(newUser==null)
-			throw new TodoCreationException(USER_NAME_EXIST_ERROR);
-		else{
-			session.setAttribute("loginedUser", newUser);
-			return todoUtil.prepareModel(newUser);
+	public ModelAndView registerUser(@ModelAttribute("user") User user, HttpSession session) throws TodoCreationException{	
+		UserResponse response = userService.registerUser(user);
+		if(Boolean.TRUE.equals(response.getSuccess())){
+			User loginedUser = response.getUser();
+			session.setAttribute("loginedUser", loginedUser);
+			return todoUtil.prepareModel(loginedUser);
+		}else{
+			throw new TodoCreationException(response.getErrorMessage());
 		}
 	}
 	
